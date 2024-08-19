@@ -2,42 +2,36 @@ import { useEffect, useState } from "react";
 
 const SimpleInput = (props) => {
   const [enteredName, setEnteredName] = useState("");
-  const [nameIsValid, setNameIsValid] = useState(false);
   const [enteredNameTouched, setEnteredNameTouched] = useState(false);
 
-  useEffect(() => {
-    if (enteredName) {
-      console.log("true");
-    }
-  }, [enteredName]);
+  const enteredNameIsValid = enteredName.trim() !== "";
+  const nameInputIsInvalid = !enteredNameIsValid && enteredNameTouched;
+  let formIsVaid;
 
-  const nameInputBlurHandler = (event) => {
-    setEnteredNameTouched(true);
-    if (enteredName.trim() === "") {
-      setNameIsValid(false);
-      return;
-    }
-  };
+  if (enteredNameIsValid) {
+    formIsVaid = true;
+  }
 
   const nameInputChangeHandler = (event) => {
     setEnteredName(event.target.value);
   };
 
-  const formSubmissionHandler = (event) => {
-    event.preventDefault();
-
+  const nameInputBlurHandler = (event) => {
     setEnteredNameTouched(true);
-
-    if (enteredName.trim() === "") {
-      setNameIsValid(false);
-      return;
-    }
-    console.log(enteredName);
-    setNameIsValid(true);
   };
 
-  const isNameInputInvalid = !enteredName && enteredNameTouched;
-  const inputClasses = isNameInputInvalid
+  const formSubmissionHandler = (event) => {
+    event.preventDefault();
+    setEnteredNameTouched(true);
+
+    if (!enteredNameIsValid) {
+      return;
+    }
+    setEnteredName("");
+    setEnteredNameTouched(false);
+  };
+
+  const inputClasses = nameInputIsInvalid
     ? "form-control invalid"
     : "form-control";
 
@@ -49,14 +43,15 @@ const SimpleInput = (props) => {
           type="text"
           id="name"
           onChange={nameInputChangeHandler}
+          onBlur={nameInputBlurHandler}
           value={enteredName}
         />
       </div>
-      {isNameInputInvalid && (
+      {nameInputIsInvalid && (
         <p className="error-text">Name should not be empty!</p>
       )}
       <div className="form-actions">
-        <button>Submit</button>
+        <button disabled={!formIsVaid}>Submit</button>
       </div>
     </form>
   );
